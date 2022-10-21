@@ -1,84 +1,61 @@
 #include <iostream>
-#include <algorithm>
-#include <sstream>
 
 //********************************************************************************************************************//
-//                                          Задача № 2 (4 балла)                                                      //
-//2_1. Дан отсортированный массив целых чисел A[0..n-1] и массив целых чисел B[0..m-1]. Для каждого элемента массив   //
-//а B[i] найдите минимальный индекс k минимального элемента массива A, равного или превосходящего B[i]: A[k] >= B[i]. //
-//Если такого элемента нет, выведите n. n, m ≤ 10000.                                                                 //
-//Требования:  Время работы поиска k для каждого элемента B[i]: O(log(k)). Внимание! В этой задаче для каждого B[i]   //
-//сначала нужно определить диапазон для бинарного поиска размером порядка k с помощью экспоненциального поиска,       //
-//а потом уже в нем делать бинарный поиск.                                                                            //
+//                                          2.1. Следующий элемент                                                    //
+// Дан отсортированный массив целых чисел A[0..n-1] и массив целых чисел B[0..m-1]. Для каждого элемента              //
+// массива B[i] найдите минимальный индекс k минимального элемента массива A, равного или превосходящего              //
+// B[i]: A[k] >= B[i]. Если такого элемента нет, выведите n. Время работы поиска k для каждого элемента               //
+// B[i]: O(log(k)). n, m ≤ 10000.                                                                                     //
 //                                                                                                                    //
-//Формат входных данных.                                                                                              //
+//Формат ввода                                                                                                        //
 //В первой строчке записаны числа n и m. Во второй и третьей массивы A и B соответственно.                            //
 //********************************************************************************************************************//
 
-int binarySearch(const unsigned *arr, int first, int last, const unsigned target) {
-    for (; last - first > 1;) {
+int binarySearch(const int32_t *, uint16_t, uint16_t, int32_t);
+int exponentialSearch(const int32_t *, uint16_t, int32_t);
+
+int binarySearch(const int32_t *arr, uint16_t first, uint16_t last, const int32_t target) {
+    for (; first != last;) {
         int middle = (first + last) / 2;
-        if (arr[middle] < target)
-            first = middle + 1;
-        else
-            last = middle;
+        if (arr[middle] < target) first = middle + 1;
+        else last = middle;
     }
-    if(first == last && first > 0) first--;
-    return (arr[last] >= target && arr[first] < target) ? last : first;
+    return first;
 }
 
-int exponentialSearch(const unsigned *arr, const int n, const unsigned x) {
-    if (arr[0] == x)
-        return 0;
-    if (arr[n - 1] < x){
-        return n;
-    }
+int exponentialSearch(const int32_t *arr, const uint16_t size, const int32_t x) {
+    if (arr[0] == x) return 0;
+    if (arr[size - 1] < x) return size;
+    if (size == 0) return 0;
 
-    int i = 1;
-    for (; i < n && arr[i] < x;)
+    uint16_t i = 1;
+    for (; i < size && arr[i] < x;)
         i = i * 2;
 
-    return binarySearch(arr, i / 2, std::min(i, n), x);
+    return binarySearch(arr, i / 2, std::min(i, size), x);
 }
 
-int fillArray(std::stringstream &ss, unsigned *array, const uint16_t len) {
-    std::string input;
-    std::getline(std::cin, input);
-    ss << input;
-
-    for (size_t i = 0; i < len; ++i) {
-        ss >> array[i];
-    }
-    return 0;
-}
 
 int main() {
-    std::stringstream ss;
-    std::string input;
+    uint16_t sortedArraySize = 0;
+    uint16_t arraySize = 0;
 
-    std::getline(std::cin, input);
-    ss << input;
+    std::cin >> sortedArraySize >> arraySize;
 
-    int sizeA = 0;
-    int sizeB = 0;
-    ss >> sizeA;
-    ss >> sizeB;
-    ss.clear();
+    auto *sortedArray = new int32_t[sortedArraySize];
+    auto *array = new int32_t[arraySize];
 
-    auto arrayA = new unsigned[sizeA];
-    auto arrayB = new unsigned[sizeB];
+    for (size_t i = 0; i < sortedArraySize; ++i)
+        std::cin >> sortedArray[i];
 
-    fillArray(ss, arrayA, sizeA);
-    ss.clear();
-    fillArray(ss, arrayB, sizeB);
-    ss.clear();
+    for (size_t i = 0; i < arraySize; ++i)
+        std::cin >> array[i];
 
-    for (int i = 0; i < sizeB; ++i) {
-        std::cout << exponentialSearch(arrayA, sizeA, arrayB[i]) << " ";
-    }
+    for (size_t i = 0; i < arraySize; ++i)
+        std::cout << exponentialSearch(sortedArray, sortedArraySize, array[i]) << " ";
 
-    delete[] arrayA;
-    delete[] arrayB;
+    delete[] sortedArray;
+    delete[] array;
 
     return 0;
 }
